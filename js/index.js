@@ -1,51 +1,57 @@
+var video = document.getElementById('video');
+video.volume=0;
+var intervalRewind;
+var intervalSet=false;
+var isPlaying=false;
+var gMouseXPos=0;
+var gMouseYPos=0;
+var normalPlayOnNoMovement=null;
+var normalPlay=function(){
+    video.playbackRate = 1.0;
+    clearInterval(intervalRewind);
+	intervalSet=false;
+};
+$(video).on('play',normalPlay);
 
+var normalPause=function(){
+    video.playbackRate = 1.0;
+    clearInterval(intervalRewind);
+	intervalSet=false;
+};
+$(video).on('pause',normalPause);
 
+var fastForward=function() { // button function for 4x fast speed forward
+    video.playbackRate = 4.0;
+};
+//$("#speed").click(fastForward);
 
-var mouseMovement;
-var videoObj=function(videoElem)
-{
-	
-	
-	this.videoElem=videoElem;
-	this.volume=0;
-	this.intervalRewind;
-	this.intervalSet=false;
-	this.isPlaying=false;
-	this.gMouseXPos=0;
-	this.gMouseYPos=0;
-	this.normalPlayOnNoMovement=null;
-	$(this.videoElem).on('play',normalPlay);
-	$(this.videoElem).on('pause',normalPause);
-	
-	this.hoverVideo=function () 
-	{ 
-	this.videoElem.play();
-	normalPlay(this); 
-	};
-	
-	this.hideVideo=function() 
-	{ this.videoElem.pause(); 
-	};
-	
-	this.hooked = $(this.videoElem).hover( this.hoverVideo, this.hideVideo );
-	//$( this.videoElem ).mousemove(mouseMovement(event,this));
-	alert(this.hooked);
-
-
-	
+var reverseHelperFunc=function(){
+       video.playbackRate = 1.0;
+       if(video.currentTime == 0){
+           clearInterval(intervalRewind);
+		   intervalSet=false;
+           video.pause();
+       }
+       else{
+           video.currentTime += -.2;
+       }
+ };
+var reverseMainfunction=function() { // button function for rewind
+   intervalRewind = setInterval(reverseHelperFunc,60);
+   intervalSet=true;
 };
 
 
-hidVid=
+
+//$("#negative").click(reverseMainfunction);
+
+$( "video" ).mousemove(function( event ) {
+	clearTimeout(normalPlayOnNoMovement);
 
 
-mouseMovement=function( event,videoObject ) {
-	clearTimeout(videoObject.normalPlayOnNoMovement);
-
-
-  var videoWidth=$(videoObject.videoElem).width();
-  var videoHeight=$(videoObject.videoElem).height();
-  var videoPosition=$(videoObject.videoElem).offset();
+  var videoWidth=$( "video").width();
+  var videoHeight=$( "video").height();
+  var videoPosition=$( "video").offset();
   var videoPositionLeft=videoPosition.left;
   var videoPositionTop=videoPosition.top;
   var pageCoords = "( " + event.pageX + ", " + event.pageY + " )";
@@ -55,88 +61,56 @@ mouseMovement=function( event,videoObject ) {
 
   var  mouseXPos=event.pageX-videoPositionLeft;
   var mouseYPos=event.pageY-videoPositionTop;
- 
+  //var mouseLocWidthRatio=mouseXPos/videoWidth;
+ // var mouseLocHeightRatio=mouseYPos/videoHeight;
     $( "span:first" ).text( "( event.pageX, event.pageY ) : " + pageCoords );
   $( "span:last" ).text( "( event.clientX, event.clientY ) : " + video.paused );
   $("p:first").html("width :"+videoWidth+" Height :+"+videoHeight+" Left: "+videoPosition.left);
-  if(mouseXPos-videoObject.gMouseXPos>0)
-  {	  if(videoObject.videoElem.currentTime==0)
+  if(mouseXPos-gMouseXPos>0/*&&mouseLocHeightRatio<.9*/)
+  {	  if(video.currentTime==0)
 	  {
-		videoObject.videoElem.play();
+		video.play();
 		}
-		normalPlay(videoObject);
-	  fastForward(videoObject);
+		normalPlay();
+	  fastForward();
   }
-  else if(mouseXPos-videoObject.gMouseXPos<0)
+  else if(mouseXPos-gMouseXPos<0/*&&mouseLocHeightRatio<.9*/)
 	{
 		
-	
-		if(!videoObject.intervalSet&&!videoObject.videoElem.currentTime==0)	
+		//if(!video.currentTime==0)
+		if(!intervalSet&&!video.currentTime==0)	
 		{
-			reverseMainfunction(videoObject);
-			
+			reverseMainfunction();
+			//normalPlay();
 		
 		}
-		
+		//else
+		//{clearInterval(intervalRewind);
+		//	video.play();
+		//}
 			
 	}
 	else
-	normalPlay(videoObject);
+	normalPlay();
   
-    videoObject.normalPlayOnNoMovement = setTimeout(function() {
+    normalPlayOnNoMovement = setTimeout(function() {
 		if(intervalSet||video.playbackRate!=1)
-			normalPlay(videoObject);
+			normalPlay();
 		
     }, 500);
 
-  videoObject.gMouseXPos=mouseXPos;
-  videoObject.gMouseYPos=mouseYPos;
+  gMouseXPos=mouseXPos;
+  gMouseYPos=mouseYPos;
   
-};
+});
 
-function normalPlay(videoObject){
-    videoObject.videoElem.playbackRate = 1.0;
-    clearInterval(videoObject.intervalRewind);
-	videoObject.intervalSet=false;
-};
+var hooked = $( "video" ).hover( hoverVideo, hideVideo );
 
-
-function normalPause(videoObject){
-    videoObject.videoElem.playbackRate = 1.0;
-    clearInterval(videoObject.intervalRewind);
-	videoObject.intervalSet=false;
-};
-
-
-var fastForward=function(videoObject) { // button function for 4x fast speed forward
-    videoObject.videoElem.playbackRate = 4.0;
-};
-
-
-var reverseHelperFunc=function(videoObject){
-       videoObject.videoElem.playbackRate = 1.0;
-       if(videoObject.videoElem.currentTime == 0){
-           clearInterval(videoObject.intervalRewind);
-		   videoObject.intervalSet=false;
-           videoObject.videoElem.pause();
-       }
-       else{
-           videoObject.videoElement.currentTime += -.2;
-       }
-};
-
-
-var reverseMainfunction=function(videoObject) { // button function for rewind
-   videoObject.intervalRewind = setInterval(reverseHelperFunc(videoObject),60);
-   videoObject.intervalSet=true;
-};
-
-
-
-var videoObject=videoObj(document.getElementById('video'));
-var  videoObject1=videoObj(document.getElementById('video1'));
-
-
-
-
-
+function hoverVideo(e) 
+{ 
+	video.play();
+	normalPlay(); 
+}
+function hideVideo(e) 
+{ video.pause(); 
+}
