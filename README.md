@@ -7,4 +7,5 @@ WORKING:
 3) When mouse is on the video element it plays normally.
 4) When mouse moves away, it pauses
 
+DEMO: https://jsfiddle.net/q3t4Lvwo/
 This is being demonstrated only for educational purposes. Author does not endorse any unethical and immoral usage of the code.
